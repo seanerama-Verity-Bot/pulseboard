@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    // `page.evaluate` callbacks run in the browser, so the specs need DOM types.
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["tests/**/*.ts", "playwright.config.ts"]
+}

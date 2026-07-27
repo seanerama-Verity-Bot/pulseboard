@@ -5,6 +5,23 @@ dist/
 .env
 .env.*
 !.env.*.example
+# .env.example is the committed template (it matches `.env.*` above).
+!.env.example
+
+# Build / tooling output
+coverage/
+*.tsbuildinfo
+.vite/
+playwright-report/
+blob-report/
+test-results/
+.playwright/
+
+# Local SQLite databases (the real one lives at /srv/pulseboard/data, ADR 0004)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 # Verity's derived state cache — never authoritative (framework-spec §5)
 .verity-cache/
 # Per-app deployment access (host + credential locations) — shared out-of-band,

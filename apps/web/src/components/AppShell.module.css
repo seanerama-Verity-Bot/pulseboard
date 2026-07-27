@@ -1,0 +1,34 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--pb-color-surface);
+  border-bottom: var(--pb-border);
+}
+
+.headerInner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--pb-space-1) var(--pb-space-3);
+  padding-block: var(--pb-space-4);
+}
+
+.title {
+  font-size: var(--pb-font-size-xl);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  color: var(--pb-color-text-muted);
+  font-size: var(--pb-font-size-sm);
+}
+
+.main {
+  flex: 1 1 auto;
+  padding-block: var(--pb-space-5) var(--pb-space-6);
+}

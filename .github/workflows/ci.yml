@@ -1,8 +1,11 @@
 name: CI
-# Pulseboard — Verity hygiene gate (stack-agnostic).
-# Honestly green on a fresh scaffold: secret-scan + a structure check, no faked
-# pass. Lint and test gates are added when the Architect chooses the stack and the
-# walking skeleton lands (the progressive gate — framework-spec §3).
+# Pulseboard — the full gate.
+#
+# `structure` and `secret-scan` are the original hygiene jobs and are required by
+# branch protection under exactly these names (ADR 0010): do not rename them.
+# `build-and-test` is the walking skeleton's addition (Stage 1) and is the gate
+# every PR clears from here on: install -> prisma generate -> lint -> typecheck ->
+# test -> build -> Playwright.
 on:
   pull_request:
   push:
@@ -34,3 +37,52 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      # CI never touches the real database; this file is created and thrown away
+      # with the runner. Playwright's webServer supplies its own DATABASE_URL.
+      DATABASE_URL: 'file:./ci.db'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # Must run BEFORE typecheck: without the generated client, `tsc` fails on
+      # a missing `@prisma/client`.
+      - name: Generate Prisma client
+        run: npx prisma generate --schema apps/server/prisma/schema.prisma
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit + integration tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests (against the built app)
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
