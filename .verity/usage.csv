@@ -1,3 +1,5 @@
 timestamp,run_id,repo,roles,tokens_in,tokens_out,est_usd,wall_secs,outcome,tool_calls,role
 2026-07-27T20:14:45.056Z,run-20260727T201003Z-0bnpsl,seanerama-Verity-Bot/pulseboard,build,1870382,13507,1.7325,273,failed,51,build
 2026-07-27T20:43:47.092Z,run-20260727T204003Z-fo8qca,seanerama-Verity-Bot/pulseboard,build,1979755,9975,1.6713,213,failed,47,build
+2026-07-27T20:44:25.316Z,run-20260727T200001Z-1i00i8,seanerama-Verity-Bot/pulseboard,review,903748,14537,1.3523,200,success,32,review
+2026-07-27T20:44:25.316Z,run-20260727T200001Z-1i00i8,seanerama-Verity-Bot/pulseboard,build,2729139,14233,9.9604,2451,failed,158,build
