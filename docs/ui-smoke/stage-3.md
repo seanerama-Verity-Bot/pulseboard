@@ -44,28 +44,27 @@ Tick every box. Any unticked box is a fail — record what you saw and stop.
 
 ## 3. The 281-character rejection (criterion A7)
 
-- [ ] Paste **281 characters** into the text box. The quickest way: type one character,
-      then paste it 280 more times — or paste this and confirm the counter agrees:
+- [ ] Put exactly **281 characters** on the clipboard and paste them into the text box.
+      Do not count them by hand — generate them:
 
-  ```
-  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  ```bash
+  printf 'a%.0s' $(seq 1 281) | xclip -selection clipboard   # Linux
+  printf 'a%.0s' $(seq 1 281) | pbcopy                       # macOS
   ```
 
-  (four lines of 80 `a`s plus one — paste it as a single line if your browser keeps the
-  line breaks; whitespace is trimmed before counting, so the count is what matters.)
+  The counter is the check that the paste was the right length, so read it before
+  believing anything else in this section.
 
-- [ ] At exactly **280** the counter reads **"0 characters left"** and the button is
-      **still clickable**.
-- [ ] At **281** the counter turns a warning colour and reads
+- [ ] With **281** in the box the counter turns a warning colour and reads
       **"1 characters over the limit"**.
-- [ ] The **"Post update"** button is **greyed out** and clicking it does nothing.
+- [ ] Pick a mood — **Focused** will do. The **"Post update"** button stays **greyed out**
+      anyway, and clicking it does nothing. Over the limit, a chosen mood does not unlock
+      it.
 - [ ] The warning is a plain sentence: **no `400`**, no "error", no JSON, no stack trace.
-- [ ] Delete one character. The counter goes back to **"0 characters left"** and the
-      button is clickable again — it recovers rather than staying stuck.
-- [ ] Clear the box before moving on.
+- [ ] Delete **one** character. The counter now reads **"0 characters left"**, and the
+      button is clickable — 280 is allowed, 281 is not, and the composer recovers rather
+      than staying stuck.
+- [ ] Clear the box (and leave the mood chosen or not, as you like) before moving on.
 
 The server enforces the same limit independently — the counter is a courtesy. Check that
 directly (this is the criterion, not the counter):
@@ -78,10 +77,35 @@ curl -i -X POST https://bench-target.taile0ffc4.ts.net/api/updates \
 
 - [ ] Status line is **`401`** with code **`NOT_AUTHENTICATED`** — no cookie was sent, and
       the server checks who you are before it looks at what you sent.
-- [ ] Repeat it with a session (add `-b` and a cookie jar from a `POST /api/session`, or
-      simply trust the automated integration test that covers this): the answer is
-      **`400`** with code **`TEXT_TOO_LONG`** and `"field":"text"`, and **no row is
-      written**.
+
+Now the same request **with** a session, which is the one that proves A7:
+
+```bash
+read -rs TEAM_CODE            # typed, not echoed, and never in shell history
+JAR=$(mktemp)
+
+curl -sS -o /dev/null -c "$JAR" \
+  -X POST https://bench-target.taile0ffc4.ts.net/api/session \
+  -H 'Content-Type: application/json' \
+  -d "{\"teamCode\":\"$TEAM_CODE\",\"displayName\":\"Smoke Test\"}"
+
+curl -i -b "$JAR" \
+  -X POST https://bench-target.taile0ffc4.ts.net/api/updates \
+  -H 'Content-Type: application/json' \
+  -d "{\"text\":\"$(printf 'a%.0s' $(seq 1 281))\",\"mood\":\"focused\"}"
+
+unset TEAM_CODE; rm -f "$JAR"
+```
+
+- [ ] Status line is **`400`**, the code is **`TEXT_TOO_LONG`**, and the body carries
+      `"field":"text"`.
+- [ ] The message is a plain sentence with no stack trace and no SQL.
+- [ ] Re-run the same command with 280 `a`s instead of 281 (`seq 1 280`): status
+      **`201`**, and the body is `{"update":{...}}` with `"canMutate":true`,
+      `"editedAt":null` and a `createdAt` ending in `Z`. That is the boundary, live.
+- [ ] When you run the row dump in section 7, the 280-character row is there and there is
+      **no 281-character row at all** — the rejection wrote nothing, which is the whole of
+      criterion A7.
 
 ## 4. The mood picker works from the keyboard
 
