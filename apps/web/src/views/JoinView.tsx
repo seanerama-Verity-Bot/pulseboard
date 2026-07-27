@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 
 import { MAX_DISPLAY_NAME_LENGTH, type Member } from '@pulseboard/shared';
 
-import { createSession, SessionApiError } from '../api/session';
+import { ApiRequestError } from '../api/client';
+import { createSession } from '../api/session';
 import styles from './JoinView.module.css';
 
 export type JoinViewProps = {
@@ -69,9 +70,9 @@ export function JoinView({ onJoined, notice = null }: JoinViewProps): JSX.Elemen
     try {
       onJoined(await createSession({ teamCode, displayName }));
     } catch (error: unknown) {
-      const code = error instanceof SessionApiError ? error.code : 'NETWORK';
+      const code = error instanceof ApiRequestError ? error.code : 'NETWORK';
       const message =
-        error instanceof SessionApiError
+        error instanceof ApiRequestError
           ? error.message
           : 'Something went wrong. Please try again.';
 

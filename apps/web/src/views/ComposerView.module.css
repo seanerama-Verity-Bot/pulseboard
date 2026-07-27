@@ -1,0 +1,150 @@
+.card {
+  background: var(--pb-color-surface);
+  border: var(--pb-border);
+  border-radius: var(--pb-radius);
+  padding: var(--pb-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-3);
+}
+
+.heading {
+  font-size: var(--pb-font-size-lg);
+  font-weight: 600;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-4);
+  margin-top: var(--pb-space-2);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-2);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--pb-font-size-sm);
+  font-weight: 600;
+}
+
+.textarea {
+  width: 100%;
+  min-width: 0;
+  /* Resizes vertically only: horizontal resize would break the 375px column. */
+  resize: vertical;
+  min-height: 5.5rem;
+  padding: var(--pb-space-3);
+  border: var(--pb-border);
+  border-radius: var(--pb-radius);
+  background: var(--pb-color-bg);
+  color: inherit;
+  font: inherit;
+  /* 16px minimum stops iOS Safari zooming the page on focus at 375px. */
+  font-size: var(--pb-font-size-md);
+  line-height: var(--pb-line-height);
+}
+
+.textarea[aria-invalid='true'] {
+  border-color: var(--pb-color-danger);
+}
+
+.textarea:disabled {
+  opacity: 0.6;
+}
+
+.counter {
+  align-self: flex-end;
+  color: var(--pb-color-text-muted);
+  font-size: var(--pb-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Over the limit: colour *and* the wording change, so the warning does not
+   depend on colour alone. */
+.counterOver {
+  color: var(--pb-color-danger);
+  font-weight: 600;
+}
+
+.moods {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.moods:disabled {
+  opacity: 0.6;
+}
+
+/* Wraps onto as many rows as it needs at 375px rather than overflowing. */
+.moodRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pb-space-2);
+  margin-top: var(--pb-space-2);
+}
+
+.mood {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pb-space-2);
+  padding: var(--pb-space-2) var(--pb-space-3);
+  border: var(--pb-border);
+  border-radius: var(--pb-radius);
+  background: var(--pb-color-bg);
+  cursor: pointer;
+  /* Comfortable target at 375px without setting an explicit width. */
+  min-height: 2.75rem;
+}
+
+/* The native radio stays visible and keyboard-driven; only the chrome is ours. */
+.moodInput {
+  margin: 0;
+  accent-color: var(--pb-color-accent);
+}
+
+.moodLabel {
+  font-size: var(--pb-font-size-sm);
+  font-weight: 600;
+}
+
+.mood:has(.moodInput:checked) {
+  border-color: var(--pb-color-accent);
+}
+
+/* Focus lives on the input; mirror it onto the whole chip so the keyboard
+   position is obvious. */
+.mood:has(.moodInput:focus-visible) {
+  outline: 2px solid var(--pb-color-accent);
+  outline-offset: 2px;
+}
+
+.error {
+  color: var(--pb-color-danger);
+  font-size: var(--pb-font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.submit {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: var(--pb-space-3) var(--pb-space-5);
+  border: 1px solid transparent;
+  border-radius: var(--pb-radius);
+  background: var(--pb-color-accent);
+  color: var(--pb-color-surface);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}

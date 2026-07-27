@@ -59,10 +59,16 @@ describe('unmatched /api routes', () => {
     });
   });
 
+  /**
+   * `POST /api/updates` was in this list until Stage 3 routed it — it now
+   * answers `401 NOT_AUTHENTICATED`, which is the point of that stage. What is
+   * asserted here is unchanged: a path no router claims is a JSON 404, whatever
+   * the method. `PATCH`/`DELETE /api/updates/:id` are still unrouted (Stage 5).
+   */
   it('does the same for a bare /api and for non-GET methods', async () => {
     for (const call of [
       request(app()).get('/api'),
-      request(app()).post('/api/updates'),
+      request(app()).post('/api/nope'),
       request(app()).delete('/api/board'),
       request(app()).patch('/api/updates/abc'),
     ]) {

@@ -37,6 +37,19 @@ export function isMood(value: unknown): value is Mood {
   return typeof value === 'string' && (MOODS as readonly string[]).includes(value);
 }
 
+/**
+ * Counts Unicode **code points** rather than UTF-16 code units, so an astral
+ * character (an emoji, say) costs one character rather than two.
+ *
+ * It lives here rather than in either app because the server's authoritative
+ * `MAX_UPDATE_LENGTH` check and the client's courtesy counter have to agree
+ * exactly: a counter that said "fine" for a 280-emoji post the server then
+ * rejected would be a bug the user cannot explain.
+ */
+export function countCharacters(text: string): number {
+  return Array.from(text).length;
+}
+
 /* ------------------------------------------------------------------ *
  * Error envelope
  * ------------------------------------------------------------------ */

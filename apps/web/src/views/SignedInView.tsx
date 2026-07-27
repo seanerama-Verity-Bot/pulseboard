@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import { type Member } from '@pulseboard/shared';
 
-import { deleteSession, SessionApiError } from '../api/session';
+import { ApiRequestError } from '../api/client';
+import { deleteSession } from '../api/session';
 import styles from './SignedInView.module.css';
 
 export type SignedInViewProps = {
@@ -32,7 +33,7 @@ export function SignedInView({ member, onSignedOut }: SignedInViewProps): JSX.El
       onSignedOut();
     } catch (caught: unknown) {
       setError(
-        caught instanceof SessionApiError
+        caught instanceof ApiRequestError
           ? caught.message
           : 'We could not sign you out just now. Please try again.',
       );
