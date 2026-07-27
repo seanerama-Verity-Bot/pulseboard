@@ -99,6 +99,7 @@ no framework HTML error pages — the spec forbids both.
 | [0007](adr/0007-server-enforced-15-minute-mutation-window-and-author-only-owner.md) | One pure `mutationDecision`, checked server-side | A5 + A6; UI hiding is courtesy, the 403 is the rule |
 | [0008](adr/0008-day-boundaries-for-the-today-yesterday-filter-use-a-pinned-app.md) | `APP_TIMEZONE` team-wide day boundaries, server-bucketed | Makes "today" a testable claim ⇒ A9 |
 | [0009](adr/0009-decline-the-catalog-helper-bot-act-2-guide-is-deferred-until-af.md) | Decline catalog `helper-bot`; Act 2 Guide deferred | Spec gates Guide behind a live MVP; catalog feature needs an LLM the non-goals forbid |
+| [0010](adr/0010-branch-protection-on-main-from-the-planning-commit-onward.md) | Branch protection on `main` before any code stage | Every code change rides a PR + green CI; Stage 1 adds `build-and-test` to the required checks |
 
 ## Walking skeleton (Stage 0)
 
