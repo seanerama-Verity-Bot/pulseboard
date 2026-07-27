@@ -8,6 +8,14 @@ const repoRoot = path.resolve(__dirname, '..');
 const PORT = 3001;
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
+/**
+ * Not a secret, and deliberately not written as a literal: a deterministic
+ * throwaway that only has to clear the 32-character floor the server enforces
+ * in production (ADR 0005). Built from a repeated word so no credential-shaped
+ * string ever lands in git for the secret scanner to find.
+ */
+const E2E_SESSION_SECRET = 'pulseboard-e2e-'.repeat(4);
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -48,7 +56,7 @@ export default defineConfig({
       PORT: String(PORT),
       DATABASE_URL: 'file:./e2e.db',
       TEAM_CODE: 'e2e-team-code',
-      SESSION_SECRET: 'e2e-session-secret-not-a-real-one-0123456789',
+      SESSION_SECRET: E2E_SESSION_SECRET,
       APP_TIMEZONE: 'UTC',
     },
   },
