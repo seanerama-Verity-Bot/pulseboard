@@ -1,0 +1,2 @@
+timestamp,run_id,repo,roles,tokens_in,tokens_out,est_usd,wall_secs,outcome,tool_calls,role
+2026-07-27T20:14:45.056Z,run-20260727T201003Z-0bnpsl,seanerama-Verity-Bot/pulseboard,build,1870382,13507,1.7325,273,failed,51,build
