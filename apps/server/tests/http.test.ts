@@ -63,7 +63,7 @@ describe('unmatched /api routes', () => {
     for (const call of [
       request(app()).get('/api'),
       request(app()).post('/api/updates'),
-      request(app()).delete('/api/session'),
+      request(app()).delete('/api/board'),
       request(app()).patch('/api/updates/abc'),
     ]) {
       const response = await call;

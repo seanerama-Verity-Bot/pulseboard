@@ -30,6 +30,22 @@ export function toApiError(code: ApiErrorCode, message: string, field?: string):
 }
 
 /**
+ * Express 4 does not catch a rejected promise from a handler — it hangs the
+ * request instead. Every `async` route goes through this so a rejection reaches
+ * the error handler and leaves as the envelope.
+ */
+export function asyncRoute(
+  handler: (
+    req: Parameters<RequestHandler>[0],
+    res: Parameters<RequestHandler>[1],
+  ) => Promise<void>,
+): RequestHandler {
+  return (req, res, next) => {
+    handler(req, res).catch(next);
+  };
+}
+
+/**
  * Terminal 404. Mounted for unmatched `/api/*` (which must never receive
  * `index.html` — ADR 0002) and as the last resort for unmatched non-GET
  * requests.

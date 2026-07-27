@@ -16,6 +16,12 @@ const BASE_URL = `http://127.0.0.1:${PORT}`;
  */
 const E2E_SESSION_SECRET = 'pulseboard-e2e-'.repeat(4);
 
+/**
+ * The throwaway team code the e2e server is started with. Not a secret either —
+ * it exists so `join.spec.ts` and the `webServer` block cannot drift apart.
+ */
+export const E2E_TEAM_CODE = 'e2e-team-code';
+
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
@@ -55,7 +61,7 @@ export default defineConfig({
       NODE_ENV: 'production',
       PORT: String(PORT),
       DATABASE_URL: 'file:./e2e.db',
-      TEAM_CODE: 'e2e-team-code',
+      TEAM_CODE: E2E_TEAM_CODE,
       SESSION_SECRET: E2E_SESSION_SECRET,
       APP_TIMEZONE: 'UTC',
     },
