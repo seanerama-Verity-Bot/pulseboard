@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+apps/server/prisma/migrations/
+package-lock.json
+
+# Frozen or externally-owned documents — never reformat these.
+contracts/
+docs/adr/
+docs/benchmark-spec.md
+stage-instructions/
+feature-assessments/

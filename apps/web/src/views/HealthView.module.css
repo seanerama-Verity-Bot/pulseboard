@@ -1,0 +1,38 @@
+.card {
+  background: var(--pb-color-surface);
+  border: var(--pb-border);
+  border-radius: var(--pb-radius);
+  padding: var(--pb-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-3);
+}
+
+.heading {
+  font-size: var(--pb-font-size-lg);
+  font-weight: 600;
+}
+
+.status {
+  font-size: var(--pb-font-size-md);
+}
+
+.ok {
+  color: var(--pb-color-ok);
+  font-weight: 600;
+}
+
+.pending {
+  color: var(--pb-color-text-muted);
+}
+
+.failed {
+  color: var(--pb-color-danger);
+  font-weight: 600;
+}
+
+.detail {
+  color: var(--pb-color-text-muted);
+  font-size: var(--pb-font-size-sm);
+  overflow-wrap: anywhere;
+}

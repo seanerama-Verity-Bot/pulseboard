@@ -1,0 +1,47 @@
+# Pulseboard — systemd unit for bench-target (ADR 0004).
+#
+# Install to /etc/systemd/system/pulseboard.service. See docs/deploy.md for the
+# full, copy-pasteable host preparation and deploy sequence.
+#
+# Nothing in this file is a secret: every value the app needs comes from
+# /etc/pulseboard/pulseboard.env, which is mode 0640, owned by bench, and never
+# committed.
+
+[Unit]
+Description=Pulseboard — team status board
+Documentation=https://github.com/seanerama-Verity-Bot/pulseboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bench
+Group=bench
+WorkingDirectory=/srv/pulseboard/current
+
+# Every environment variable lives here (NODE_ENV, PORT, DATABASE_URL,
+# TEAM_CODE, SESSION_SECRET, APP_TIMEZONE). The server refuses to start if it is
+# missing or incomplete.
+EnvironmentFile=/etc/pulseboard/pulseboard.env
+
+ExecStart=/usr/bin/env node /srv/pulseboard/current/apps/server/dist/index.js
+
+Restart=always
+RestartSec=2
+TimeoutStopSec=20
+KillSignal=SIGTERM
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pulseboard
+
+# Modest hardening. The database lives outside the release directory so a deploy
+# can never clobber it (ADR 0004), and it is the only path the service writes to.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/srv/pulseboard/data
+
+[Install]
+WantedBy=multi-user.target

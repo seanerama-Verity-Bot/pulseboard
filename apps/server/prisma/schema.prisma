@@ -1,0 +1,35 @@
+// Pulseboard persistence — implements `contracts/persistence-v1.md` in full.
+//
+// The complete schema lands in Stage 1 on purpose: no feature stage should have
+// to touch migrations just to add a column. All DateTime values are UTC
+// instants; no local time is ever persisted (ADR 0008).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id             String   @id @default(cuid())
+  displayName    String // as typed (trimmed), for display
+  normalizedName String   @unique // lowercased + whitespace-collapsed; the find-or-create key (ADR 0005)
+  joinedAt       DateTime @default(now())
+  updates        Update[]
+}
+
+model Update {
+  id        String    @id @default(cuid())
+  authorId  String
+  author    Member    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  text      String // 1..280 chars — enforced in domain/, not by SQLite
+  mood      String // 'focused'|'cruising'|'blocked'|'away'
+  createdAt DateTime  @default(now())
+  editedAt  DateTime?
+
+  @@index([createdAt])
+  @@index([authorId, createdAt])
+}

@@ -1,0 +1,111 @@
+/*
+ * Global tokens and the single content column.
+ *
+ * Hand-written on purpose: no UI component library, no CSS framework, no icon
+ * font (spec pin + the A8 Lighthouse budget). Everything else in the app uses
+ * CSS Modules and reads these custom properties.
+ */
+
+:root {
+  /* Colour */
+  --pb-color-bg: #f6f7f9;
+  --pb-color-surface: #ffffff;
+  --pb-color-border: #dcdfe4;
+  --pb-color-text: #1c2024;
+  --pb-color-text-muted: #5b6472;
+  --pb-color-accent: #2f5bd7;
+  --pb-color-ok: #1a7f4b;
+  --pb-color-warn: #8a5300;
+  --pb-color-danger: #b3261e;
+
+  /* Spacing scale */
+  --pb-space-1: 0.25rem;
+  --pb-space-2: 0.5rem;
+  --pb-space-3: 0.75rem;
+  --pb-space-4: 1rem;
+  --pb-space-5: 1.5rem;
+  --pb-space-6: 2rem;
+
+  /* Type scale */
+  --pb-font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --pb-font-size-sm: 0.875rem;
+  --pb-font-size-md: 1rem;
+  --pb-font-size-lg: 1.25rem;
+  --pb-font-size-xl: 1.5rem;
+  --pb-line-height: 1.5;
+
+  /* Shape */
+  --pb-radius: 8px;
+  --pb-border: 1px solid var(--pb-color-border);
+
+  /* Layout: the shared content column, usable at 375px. */
+  --pb-content-max-width: 60rem;
+  --pb-content-gutter: var(--pb-space-4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pb-color-bg: #14171a;
+    --pb-color-surface: #1d2125;
+    --pb-color-border: #333a42;
+    --pb-color-text: #e9ecf1;
+    --pb-color-text-muted: #a3adba;
+    --pb-color-accent: #86a8ff;
+    --pb-color-ok: #63d197;
+    --pb-color-warn: #e2b661;
+    --pb-color-danger: #ff8f86;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--pb-color-bg);
+  color: var(--pb-color-text);
+  font-family: var(--pb-font-sans);
+  font-size: var(--pb-font-size-md);
+  line-height: var(--pb-line-height);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+/*
+ * The content column. `min-width: 0` plus the gutter keeps it comfortable at
+ * 375px without a horizontal scrollbar.
+ */
+.pb-column {
+  width: 100%;
+  min-width: 0;
+  max-width: var(--pb-content-max-width);
+  margin: 0 auto;
+  padding-inline: var(--pb-content-gutter);
+}
+
+:focus-visible {
+  outline: 2px solid var(--pb-color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
