@@ -5,7 +5,7 @@
  * database, a server or a browser.
  */
 
-import { MAX_UPDATE_LENGTH } from '@pulseboard/shared';
+import { countCharacters, MAX_UPDATE_LENGTH } from '@pulseboard/shared';
 
 export type UpdateTextErrorCode = 'TEXT_EMPTY' | 'TEXT_TOO_LONG';
 
@@ -14,12 +14,13 @@ export type UpdateTextResult =
   | { ok: false; code: UpdateTextErrorCode; message: string; field: 'text' };
 
 /**
- * Counts Unicode code points rather than UTF-16 code units, so an astral
- * character (an emoji, say) costs one character rather than two.
+ * Re-exported, not re-implemented. The code-point counting rule moved to
+ * `@pulseboard/shared` in Stage 3 so the client's live counter and this
+ * authoritative check are literally the same function — two implementations
+ * that "obviously agree" is how a 280-emoji post gets rejected by one side and
+ * accepted by the other.
  */
-export function countCharacters(text: string): number {
-  return Array.from(text).length;
-}
+export { countCharacters };
 
 /**
  * The single authority on update text (`contracts/http-api-v1.md`):

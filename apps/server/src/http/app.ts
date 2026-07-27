@@ -2,7 +2,7 @@
  * Express app assembly. Registration order is the contract:
  *
  *   1. `/healthz`            — liveness, no auth, no DB
- *   2. `/api/...`            — the JSON API (`/api/session` from Stage 2; more later)
+ *   2. `/api/...`            — the JSON API (`/api/session`, `/api/updates`; more later)
  *   3. `/api` catch-all      — JSON 404, never `index.html` (ADR 0002)
  *   4. static + SPA fallback — the built client
  *   5. terminal 404          — JSON for anything left (e.g. `POST /nope`)
@@ -15,6 +15,7 @@ import express, { type Express, Router } from 'express';
 import { errorHandler, notFoundHandler } from './errors';
 import { createHealthRouter } from './health';
 import { createSessionRouter } from './session';
+import { createUpdatesRouter } from './updates';
 import { registerStaticRoutes } from '../static/spa';
 
 export type CreateAppOptions = {
@@ -54,6 +55,12 @@ export function createApp(options: CreateAppOptions): Express {
   api.use(
     createSessionRouter({
       teamCode: options.teamCode ?? null,
+      sessionSecret: options.sessionSecret ?? null,
+      isProduction: options.isProduction ?? false,
+    }),
+  );
+  api.use(
+    createUpdatesRouter({
       sessionSecret: options.sessionSecret ?? null,
       isProduction: options.isProduction ?? false,
     }),

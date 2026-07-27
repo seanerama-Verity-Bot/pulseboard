@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 
-import { type Member } from '@pulseboard/shared';
+import { type Member, type Update } from '@pulseboard/shared';
 
-import { fetchSession, NETWORK_ERROR_MESSAGE } from './api/session';
+import { NETWORK_ERROR_MESSAGE } from './api/client';
+import { fetchSession } from './api/session';
 import { AppShell } from './components/AppShell';
+import { ComposerView } from './views/ComposerView';
 import { HealthView } from './views/HealthView';
 import { JoinView } from './views/JoinView';
+import { PostedUpdatesView } from './views/PostedUpdatesView';
 import { SignedInView } from './views/SignedInView';
 import styles from './App.module.css';
 
@@ -23,6 +26,13 @@ type SessionState =
 
 export function App(): JSX.Element {
   const [session, setSession] = useState<SessionState>({ kind: 'checking' });
+  /**
+   * The updates posted from this tab, newest first — Stage 3's stand-in for the
+   * board. Nothing is read back from the server yet: `GET /api/board` is Stage
+   * 4, so this list is empty after a reload even though every row it showed is
+   * still in the database.
+   */
+  const [posted, setPosted] = useState<Update[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -71,12 +81,25 @@ export function App(): JSX.Element {
         )}
 
         {session.kind === 'signedIn' && (
-          <SignedInView
-            member={session.member}
-            onSignedOut={() => {
-              setSession({ kind: 'anonymous', notice: null });
-            }}
-          />
+          <>
+            <SignedInView
+              member={session.member}
+              onSignedOut={() => {
+                // Somebody else may be about to join on this device: their
+                // board must not open on the last person's updates.
+                setPosted([]);
+                setSession({ kind: 'anonymous', notice: null });
+              }}
+            />
+
+            <ComposerView
+              onPosted={(update) => {
+                setPosted((previous) => [update, ...previous]);
+              }}
+            />
+
+            <PostedUpdatesView updates={posted} />
+          </>
         )}
 
         <HealthView />

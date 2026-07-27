@@ -1,96 +1,24 @@
+import { type CreateSessionRequest, type Member, type SessionResponse } from '@pulseboard/shared';
+
 import {
-  type ApiError,
-  type CreateSessionRequest,
-  type Member,
-  type SessionResponse,
-} from '@pulseboard/shared';
+  ACCEPT_JSON,
+  ApiRequestError,
+  JSON_HEADERS,
+  NETWORK_ERROR_CODE,
+  NETWORK_ERROR_MESSAGE,
+  readJson,
+  send,
+  toError,
+} from './client';
 
 /**
- * The `/api/session` calls (`contracts/http-api-v1.md`). Same-origin in
- * production and, thanks to the Vite proxy, in dev too — so no base URL is ever
- * configured on the client and the session cookie behaves identically in both.
- *
- * Every failure arrives as a {@link SessionApiError} carrying the server's
- * stable `code`, so a view can tell "wrong team code" from "the board is
- * unreachable" without parsing a message.
+ * The `/api/session` calls (`contracts/http-api-v1.md`). The transport, the
+ * error envelope and the {@link ApiRequestError} type all live in `./client`,
+ * shared with every other endpoint.
  */
-
-/**
- * The code used when there is no `http-api-v1` envelope to read at all: the
- * request never left, the connection dropped, or the answer was not the shape
- * we expect. Never a real server code, so a `switch` cannot confuse the two.
- */
-export const NETWORK_ERROR_CODE = 'NETWORK';
-
-/** Human, polite, and free of status codes and stack traces. */
-export const NETWORK_ERROR_MESSAGE =
-  'We could not reach the board just now. Please check your connection and try again.';
-
-export class SessionApiError extends Error {
-  /** An `ApiErrorCode`, or {@link NETWORK_ERROR_CODE}. */
-  readonly code: string;
-  /** The HTTP status, or `null` when the request never got an answer. */
-  readonly status: number | null;
-  /** Present on validation failures, e.g. `"displayName"`. */
-  readonly field: string | undefined;
-
-  constructor(code: string, message: string, status: number | null, field?: string) {
-    super(message);
-    this.name = 'SessionApiError';
-    this.code = code;
-    this.status = status;
-    this.field = field;
-  }
-}
-
-const JSON_HEADERS = { Accept: 'application/json', 'Content-Type': 'application/json' };
-
-/**
- * `credentials: 'same-origin'` is what makes the session cookie flow. A network
- * failure becomes a {@link SessionApiError} rather than a raw `TypeError`, so
- * callers have exactly one error type to handle.
- */
-async function send(path: string, init: RequestInit): Promise<Response> {
-  try {
-    return await fetch(path, { credentials: 'same-origin', ...init });
-  } catch {
-    throw new SessionApiError(NETWORK_ERROR_CODE, NETWORK_ERROR_MESSAGE, null);
-  }
-}
-
-/** Turns a non-OK response into an error, preferring the server's own envelope. */
-async function toError(response: Response): Promise<SessionApiError> {
-  try {
-    const body: unknown = await response.json();
-    const envelope = (body as Partial<ApiError>).error;
-
-    if (
-      typeof envelope === 'object' &&
-      envelope !== null &&
-      typeof envelope.code === 'string' &&
-      typeof envelope.message === 'string'
-    ) {
-      return new SessionApiError(
-        envelope.code,
-        envelope.message,
-        response.status,
-        typeof envelope.field === 'string' ? envelope.field : undefined,
-      );
-    }
-  } catch {
-    // No JSON body, or not the envelope: fall through to the generic message.
-  }
-
-  return new SessionApiError(NETWORK_ERROR_CODE, NETWORK_ERROR_MESSAGE, response.status);
-}
 
 async function readMember(response: Response): Promise<Member> {
-  let body: unknown;
-  try {
-    body = await response.json();
-  } catch {
-    throw new SessionApiError(NETWORK_ERROR_CODE, NETWORK_ERROR_MESSAGE, response.status);
-  }
+  const body = await readJson(response);
 
   const member = (body as Partial<SessionResponse>).member;
   if (
@@ -100,7 +28,7 @@ async function readMember(response: Response): Promise<Member> {
     typeof member.displayName !== 'string' ||
     typeof member.joinedAt !== 'string'
   ) {
-    throw new SessionApiError(NETWORK_ERROR_CODE, NETWORK_ERROR_MESSAGE, response.status);
+    throw new ApiRequestError(NETWORK_ERROR_CODE, NETWORK_ERROR_MESSAGE, response.status);
   }
 
   return member;
@@ -113,7 +41,7 @@ async function readMember(response: Response): Promise<Member> {
 export async function fetchSession(signal?: AbortSignal): Promise<Member | null> {
   const response = await send('/api/session', {
     method: 'GET',
-    headers: { Accept: 'application/json' },
+    headers: ACCEPT_JSON,
     ...(signal ? { signal } : {}),
   });
 
@@ -149,7 +77,7 @@ export async function createSession(input: CreateSessionRequest): Promise<Member
 export async function deleteSession(): Promise<void> {
   const response = await send('/api/session', {
     method: 'DELETE',
-    headers: { Accept: 'application/json' },
+    headers: ACCEPT_JSON,
   });
 
   if (!response.ok) {
