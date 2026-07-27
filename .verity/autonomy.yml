@@ -1,0 +1,23 @@
+# Verity Bench v0.2 — FROZEN worker policy (committed as .verity/autonomy.yml
+# by arm-worker.sh). Hash this file and publish the hash with results.
+#
+# autonomous + trust 2: the worker merges any PR with an approve verdict and
+# green CI. Daily limits sit ABOVE the bench token/cost caps so the framework's
+# own breaker never masks a DNF-budget verdict (Section 5 of the runbook).
+mode: autonomous
+humans:
+  - "seanerama" # your human GitHub login — the worker refuses to run AS you
+review:
+  trust: 2
+# EVERY limit is stated explicitly, including the ones whose defaults would
+# otherwise apply silently. v0.2's first pilot set only three of the five, and
+# the unset `max_tokens_per_run` default (2,000,000) tripped on the very first
+# worker tick — reported as `limit_hit`, which is exactly the framework breaker
+# masking a bench verdict that runbook §5 says must never be masked.
+limits:
+  max_chained_roles: 6
+  max_tokens_per_run: 20000000 # 10x the 2M default; the USD cap is the real guard
+  max_wall_clock_min: 240 # 45-minute default is far too short for a build role
+  max_runs_per_day: 150
+  max_usd_per_day: 200
+commit_usage: true
