@@ -1,0 +1,11 @@
+/* The one vertical rhythm every view stacks into. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pb-space-5);
+  min-width: 0;
+}
+
+.checking {
+  color: var(--pb-color-text-muted);
+}

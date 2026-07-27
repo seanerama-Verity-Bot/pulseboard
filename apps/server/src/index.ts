@@ -23,7 +23,13 @@ async function main(): Promise<void> {
 
   await enableWalMode();
 
-  const app = createApp({ version, webDistPath: resolveWebDistPath() });
+  const app = createApp({
+    version,
+    webDistPath: resolveWebDistPath(),
+    teamCode: config.teamCode,
+    sessionSecret: config.sessionSecret,
+    isProduction: config.isProduction,
+  });
 
   const server: Server = app.listen(config.port, HOST, () => {
     logger.info(
